@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/documents")
@@ -26,7 +27,8 @@ public class DocumentController {
             @RequestParam("file") MultipartFile file) {
         try {
             String finalName = (name == null || name.isEmpty()) ? file.getOriginalFilename() : name;
-            Document savedDoc = documentService.saveDocument(finalName, email, file);
+            byte[] fileData = file.getBytes();
+            Document savedDoc = documentService.saveDocument(finalName, email, fileData);
             return new ResponseEntity<>(savedDoc, HttpStatus.CREATED);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -36,6 +38,11 @@ public class DocumentController {
     @GetMapping("/list")
     public ResponseEntity<List<Document>> getAllDocuments() {
         return ResponseEntity.ok(documentService.getAllDocuments());
+    }
+
+    @GetMapping("/metadata")
+    public ResponseEntity<List<Map<String, Object>>> getAllMetadata() {
+        return ResponseEntity.ok(documentService.getAllMetadata());
     }
 
     @GetMapping("/{id}")

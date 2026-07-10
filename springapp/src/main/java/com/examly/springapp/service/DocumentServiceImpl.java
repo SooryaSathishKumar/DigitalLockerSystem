@@ -4,10 +4,12 @@ import com.examly.springapp.model.Document;
 import com.examly.springapp.repository.DocumentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
-import java.io.IOException;
+
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class DocumentServiceImpl implements DocumentService {
@@ -16,16 +18,12 @@ public class DocumentServiceImpl implements DocumentService {
     private DocumentRepository documentRepository;
 
     @Override
-    public Document saveDocument(String name, String email, MultipartFile file) throws IOException {
-        byte[] bytes = (file != null) ? file.getBytes() : new byte[0];
-        String contentType = (file != null) ? file.getContentType() : "application/octet-stream";
-        return documentRepository.save(new Document(name, email, contentType, bytes));
-    }
-
-    @Override
-    public Document saveDocument(MultipartFile file, String email) throws IOException {
-        String name = (file != null) ? file.getOriginalFilename() : "document";
-        return saveDocument(name, email, file);
+    public Document saveDocument(String filename, String email, byte[] fileData) {
+        Document doc = new Document();
+        doc.setFilename(filename);
+        doc.setEmail(email);
+        doc.setFileData(fileData);
+        return documentRepository.save(doc);
     }
 
     @Override
@@ -36,5 +34,16 @@ public class DocumentServiceImpl implements DocumentService {
     @Override
     public List<Document> getAllDocuments() {
         return documentRepository.findAll();
+    }
+
+    @Override
+    public List<Map<String, Object>> getAllMetadata() {
+        return documentRepository.findAll().stream().map(doc -> {
+            Map<String, Object> map = new HashMap<>();
+            map.put("id", doc.getId());
+            map.put("filename", doc.getFilename());
+            map.put("email", doc.getEmail());
+            return map;
+        }).collect(Collectors.toList());
     }
 }

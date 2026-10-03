@@ -1,14 +1,29 @@
 package com.examly.springapp.service;
 
-import com.examly.springapp.model.Document;
+import com.examly.springapp.dto.DocumentResponse;
+import com.examly.springapp.dto.DocumentUpdateRequest;
+import org.springframework.core.io.Resource;
+import org.springframework.web.multipart.MultipartFile;
+
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
 public interface DocumentService {
 
-    Document saveDocument(String filename, String email, byte[] fileData);
-    Optional<Document> getDocument(Long id);
-    List<Document> getAllDocuments();
-    List<Map<String, Object>> getAllMetadata();
+    DocumentResponse uploadDocument(MultipartFile file);
+
+    DocumentResponse uploadDocument(MultipartFile file, Long parentFolderId, String tags);
+
+    List<DocumentResponse> getMyDocuments();
+
+    List<DocumentResponse> searchDocuments(String name, String fileType, String tag, Long minSize, Long maxSize);
+
+    DocumentResponse getDocumentById(Long id);
+
+    Resource downloadDocument(Long id);
+
+    DocumentResponse updateDocument(Long id, DocumentUpdateRequest request);
+
+    void deleteDocument(Long id);
+
+    String getDocumentFilename(Long id);
 }

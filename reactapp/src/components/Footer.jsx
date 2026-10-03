@@ -3,7 +3,7 @@ import React from 'react';
 function Footer() {
   return (
     <footer className="footer">
-      <p>© 2025 Digital Locker</p>
+      <p>&copy; 2026 Digital Locker</p>
     </footer>
   );
 }

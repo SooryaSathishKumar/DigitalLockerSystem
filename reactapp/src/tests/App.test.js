@@ -8,6 +8,8 @@ import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import DocumentList from "../components/DocumentList";
 import UploadPage from "../components/UploadPage";
+import CreateFolder from "../components/CreateFolder";
+import { AuthProvider } from "../context/AuthContext";
 
 jest.mock("axios");
 
@@ -81,5 +83,22 @@ describe("DigitalLockerAppTests", () => {
     render(<DocumentList />);
     expect(await screen.findByText("DocA")).toBeInTheDocument();
     expect(await screen.findByText("DocB")).toBeInTheDocument();
+  });
+
+  test("folder cards do not show document count labels", async () => {
+    localStorage.setItem("dls_user", JSON.stringify({ role: "USER" }));
+    axios.get.mockResolvedValueOnce({
+      data: [{ id: 1, name: "Bills", documentCount: 0, createdAt: "2025-01-01T00:00:00Z" }]
+    });
+
+    render(
+      <AuthProvider>
+        <CreateFolder />
+      </AuthProvider>,
+      { wrapper: MemoryRouter }
+    );
+
+    expect(await screen.findByText("Bills")).toBeInTheDocument();
+    expect(screen.queryByText(/0\s+documents/i)).not.toBeInTheDocument();
   });
 });
